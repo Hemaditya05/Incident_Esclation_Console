@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-card">
+        <h1>Incident Escalation Console</h1>
+        <p class="muted">Employees report incidents. Teams resolve them. Admin monitors all.</p>
+        <div class="hero-actions">
+            <a class="btn " href="{{ url_for('employee_login') }}">Employee Login</a>
+            <a class="btn " href="{{ url_for('team_login') }}">Team Login</a>
+            <a class="btn " href="{{ url_for('admin_login') }}">Admin Login</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

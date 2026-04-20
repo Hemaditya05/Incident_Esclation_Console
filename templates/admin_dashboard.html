@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Admin Dashboard</h1>
+        <p class="muted">{{ user_email }}</p>
+    </div>
+    <div class="actions">
+        <input type="text" id="adminSearch" class="dashboard-filter" placeholder="Search title / team / reporter">
+        <select id="adminStatusFilter" class="dashboard-filter">
+            <option value="ALL">All Statuses</option>
+            <option value="Open">Open</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+            <option value="Closed">Closed</option>
+            <option value="Escalated">Escalated</option>
+        </select>
+        <a class="btn secondary" href="{{ url_for('logout') }}">Logout</a>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>Total</h3>
+        <div class="stat-value">{{ incidents|length }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>High Severity</h3>
+        <div class="stat-value">{{ incidents|selectattr('severity', 'equalto', 'High')|list|length }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Open</h3>
+        <div class="stat-value">{{ incidents|selectattr('status', 'equalto', 'Open')|list|length }}</div>
+    </div>
+    <div class="stat-card">
+        <h3>Escalated</h3>
+        <div class="stat-value">{{ incidents|selectattr('status', 'equalto', 'Escalated')|list|length }}</div>
+    </div>
+</div>
+
+<div id="adminCards" class="card-grid">
+    {% for item in incidents %}
+    <div class="card admin-card"
+         data-title="{{ item.title|lower }}"
+         data-team="{{ item.team|lower }}"
+         data-reporter="{{ item.reporterName|lower }}"
+         data-status="{{ item.status }}">
+        <div class="card-top">
+            <div>
+                <h3>{{ item.title }}</h3>
+                <div class="muted">{{ item.incidentId }}</div>
+            </div>
+            <span class="badge severity-{{ item.severity|lower }}">{{ item.severity }}</span>
+        </div>
+
+        <p>{{ item.description }}</p>
+
+        <div class="meta">
+            <div><strong>Reporter:</strong> {{ item.reporterName }}</div>
+            <div><strong>Email:</strong> {{ item.reporterEmail }}</div>
+            <div><strong>Team:</strong> {{ item.team }}</div>
+            <div><strong>Status:</strong>
+                {% if item.status == 'Open' %}
+                    <span class="badge status-open">{{ item.status }}</span>
+                {% elif item.status == 'In Progress' %}
+                    <span class="badge status-progress">{{ item.status }}</span>
+                {% elif item.status == 'Resolved' %}
+                    <span class="badge status-resolved">{{ item.status }}</span>
+                {% elif item.status == 'Closed' %}
+                    <span class="badge status-closed">{{ item.status }}</span>
+                {% elif item.status == 'Escalated' %}
+                    <span class="badge status-escalated">{{ item.status }}</span>
+                {% else %}
+                    <span class="badge status">{{ item.status }}</span>
+                {% endif %}
+            </div>
+            <div><strong>Category:</strong> {{ item.category }}</div>
+            <div><strong>Created:</strong> {{ item.createdAt }}</div>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h3>No incidents yet</h3>
+        <p>Nothing to show.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    const cards = document.querySelectorAll(".admin-card");
+
+    function applyAdminFilters() {
+        const status = document.getElementById("adminStatusFilter").value;
+        const search = document.getElementById("adminSearch").value.trim().toLowerCase();
+
+        cards.forEach(card => {
+            const matchStatus = status === "ALL" || card.dataset.status === status;
+            const matchSearch = !search ||
+                card.dataset.title.includes(search) ||
+                card.dataset.team.includes(search) ||
+                card.dataset.reporter.includes(search);
+
+            card.style.display = matchStatus && matchSearch ? "" : "none";
+        });
+    }
+
+    document.getElementById("adminStatusFilter").addEventListener("change", applyAdminFilters);
+    document.getElementById("adminSearch").addEventListener("input", applyAdminFilters);
+</script>
+{% endblock %}

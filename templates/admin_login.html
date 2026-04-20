@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-card small-card">
+    <h1>Admin Login</h1>
+    <p class="muted">Login to monitor all incidents</p>
+
+    {% if error %}
+    <div class="error-box">{{ error }}</div>
+    {% endif %}
+
+    <form action="{{ url_for('admin_login_submit') }}" method="post" class="incident-form">
+        <label>Email</label>
+        <input type="email" name="email" required>
+
+        <label>Password</label>
+        <input type="password" name="password" required>
+
+        <div class="actions">
+            <a href="{{ url_for('landing') }}" class="btn secondary">Back</a>
+            <button type="submit" class="btn">Login</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

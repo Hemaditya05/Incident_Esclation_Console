@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{{ team_name }} Dashboard</h1>
+        <p class="muted">{{ user_email }}</p>
+    </div>
+    <a class="btn secondary" href="{{ url_for('logout') }}">Logout</a>
+</div>
+
+<div class="card-grid">
+    {% for item in incidents %}
+    <div class="card">
+        <div class="card-top">
+            <div>
+                <h3>{{ item.title }}</h3>
+                <div class="muted">{{ item.incidentId }}</div>
+            </div>
+            <span class="badge severity-{{ item.severity|lower }}">{{ item.severity }}</span>
+        </div>
+
+        <p>{{ item.description }}</p>
+
+        <div class="meta">
+            <div><strong>Reporter:</strong> {{ item.reporterName }}</div>
+            <div><strong>Email:</strong> {{ item.reporterEmail }}</div>
+            <div><strong>Status:</strong> <span class="badge status">{{ item.status }}</span></div>
+            <div><strong>Category:</strong> {{ item.category }}</div>
+            <div><strong>Created:</strong> {{ item.createdAt }}</div>
+            <div><strong>Escalation:</strong> {{ item.escalationAt }}</div>
+        </div>
+
+        <form action="{{ url_for('team_update_status', incident_id=item.incidentId) }}" method="post" class="update-form">
+            <select name="status" required>
+                <option value="">Change status</option>
+                <option value="Open">Open</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Closed">Closed</option>
+            </select>
+            <button type="submit" class="btn secondary">Update</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h3>No incidents for this team</h3>
+        <p>Nothing assigned yet.</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

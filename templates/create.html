@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-shell">
+    <div class="form-card wide-card">
+        <h1>Create Incident</h1>
+
+        <form action="{{ url_for('create_page_submit') }}" method="post" class="incident-form two-col-form">
+            <div class="field full">
+                <label>Employee Name</label>
+                <input type="text" value="{{ reporter_name }}" readonly>
+            </div>
+
+            <div class="field full">
+                <label>Employee Email</label>
+                <input type="email" value="{{ reporter_email }}" readonly>
+            </div>
+
+            <div class="field full">
+                <label>Title</label>
+                <input type="text" name="title" required>
+            </div>
+
+            <div class="field full">
+                <label>Description</label>
+                <textarea name="description" rows="5" required></textarea>
+            </div>
+
+            <div class="field">
+                <label>Severity</label>
+                <select name="severity" required>
+                    <option value="">Select severity</option>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Team</label>
+                <select name="team" id="team" onchange="toggleOther('team')" required>
+                    <option value="">Select team</option>
+                    {% for item in team_options %}
+                    <option value="{{ item }}">{{ item }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field full" id="team_other_wrap" style="display:none;">
+                <label>Custom Team</label>
+                <input type="text" name="team_other" id="team_other" placeholder="Enter custom team">
+            </div>
+
+            <div class="field">
+                <label>Category</label>
+                <select name="category" id="category" onchange="toggleOther('category')" required>
+                    <option value="">Select category</option>
+                    {% for item in category_options %}
+                    <option value="{{ item }}">{{ item }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="field spacer"></div>
+
+            <div class="field full" id="category_other_wrap" style="display:none;">
+                <label>Custom Category</label>
+                <input type="text" name="category_other" id="category_other" placeholder="Enter custom category">
+            </div>
+
+            <div class="field full">
+                <label>Escalation Mode</label>
+                <div class="segmented">
+                    <label class="segment-option">
+                        <input type="radio" name="escalation_mode" value="default" checked onclick="toggleEscalationMode()">
+                        <span>Default SLA</span>
+                    </label>
+                    <label class="segment-option">
+                        <input type="radio" name="escalation_mode" value="manual" onclick="toggleEscalationMode()">
+                        <span>Manual Time</span>
+                    </label>
+                </div>
+            </div>
+
+            <div id="manualEscalationBox" class="field-group full two-col" style="display:none;">
+                <div class="field">
+                    <label>Escalation Date</label>
+                    <input type="date" name="manual_escalation_date" id="manual_escalation_date">
+                </div>
+
+                <div class="field">
+                    <label>Escalation Time</label>
+                    <input type="time" name="manual_escalation_time" id="manual_escalation_time">
+                </div>
+            </div>
+
+            <div class="actions full">
+                <a href="{{ url_for('logout') }}" class="btn secondary">Logout</a>
+                <button type="submit" class="btn">Create Incident</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if success %}
+<script>
+    alert("Incident reported successfully");
+</script>
+{% endif %}
+
+<script>
+function toggleOther(field) {
+    const select = document.getElementById(field);
+    const wrap = document.getElementById(field + "_other_wrap");
+    const other = document.getElementById(field + "_other");
+    if (select.value === "Other") {
+        wrap.style.display = "block";
+        other.required = true;
+    } else {
+        wrap.style.display = "none";
+        other.required = false;
+        other.value = "";
+    }
+}
+
+function toggleEscalationMode() {
+    const selected = document.querySelector('input[name="escalation_mode"]:checked').value;
+    const box = document.getElementById("manualEscalationBox");
+    const dateInput = document.getElementById("manual_escalation_date");
+    const timeInput = document.getElementById("manual_escalation_time");
+
+    if (selected === "manual") {
+        box.style.display = "grid";
+        dateInput.required = true;
+        timeInput.required = true;
+    } else {
+        box.style.display = "none";
+        dateInput.required = false;
+        timeInput.required = false;
+        dateInput.value = "";
+        timeInput.value = "";
+    }
+}
+</script>
+{% endblock %}

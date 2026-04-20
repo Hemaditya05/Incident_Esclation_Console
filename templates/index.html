@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Incident Dashboard</h1>
+        <p>View and manage all incidents</p>
+    </div>
+    <div style="display:flex; gap:10px;">
+        <form action="{{ url_for('run_auto_escalation') }}" method="post">
+            <button type="submit" class="btn secondary">Run Auto Escalation</button>
+        </form>
+        <a class="btn" href="{{ url_for('create_page') }}">+ New Incident</a>
+    </div>
+</div>
+
+<div class="card-grid">
+    {% for item in incidents %}
+    <div class="card">
+        <div class="card-top">
+            <div>
+                <h3>{{ item.title }}</h3>
+                <div class="muted">{{ item.incidentId }}</div>
+            </div>
+            <span class="badge severity-{{ item.severity|lower }}">{{ item.severity }}</span>
+        </div>
+
+        <p>{{ item.description }}</p>
+
+        <div class="meta">
+            <div><strong>Reporter:</strong> {{ item.reporterName }}</div>
+            <div><strong>Email:</strong> {{ item.reporterEmail }}</div>
+            <div><strong>Team:</strong> {{ item.team }}</div>
+            <div><strong>Status:</strong> <span class="badge status">{{ item.status }}</span></div>
+            <div><strong>Category:</strong> {{ item.category }}</div>
+            <div><strong>Created:</strong> {{ item.createdAt }}</div>
+            <div><strong>Escalation:</strong> {{ item.escalationAt }}</div>
+        </div>
+
+        <form action="{{ url_for('update_page_submit', incident_id=item.incidentId) }}" method="post" class="update-form">
+            <select name="status" required>
+                <option value="">Change status</option>
+                <option value="Open">Open</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Closed">Closed</option>
+            </select>
+            <button type="submit" class="btn secondary">Update</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <h3>No incidents yet</h3>
+        <p>Create your first incident.</p>
+        <a class="btn" href="{{ url_for('create_page') }}">Create Incident</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
